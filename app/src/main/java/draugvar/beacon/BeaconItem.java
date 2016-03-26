@@ -1,7 +1,10 @@
 package draugvar.beacon;
 
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
@@ -34,17 +37,28 @@ public class BeaconItem extends AbstractItem<BeaconItem, BeaconItem.ViewHolder> 
         viewHolder.name.setText(String.format("ID1: %s", name));
         //set the text for the distance or hide
         viewHolder.distance.setText(String.format("Distance: %s", distance));
+        viewHolder.immagine.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(v.getContext(), ClueActivity.class);
+                v.getContext().startActivity(i);
+            }
+        });
     }
+
+
 
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     protected static class ViewHolder extends RecyclerView.ViewHolder {
         protected TextView name;
         protected TextView distance;
+        protected ImageView immagine;
 
         public ViewHolder(View view) {
             super(view);
             this.name = (TextView) view.findViewById(R.id.id1);
             this.distance = (TextView) view.findViewById(R.id.distance);
+            this.immagine=(ImageView)view.findViewById(R.id.immagine);
         }
     }
 }

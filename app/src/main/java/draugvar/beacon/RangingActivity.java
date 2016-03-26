@@ -13,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.mikepenz.fastadapter.adapters.FastItemAdapter;
 
@@ -66,6 +68,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.beacon_recycler_view);
         assert recyclerView != null;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         //create our FastAdapter which will manage everything
         fastAdapter = new FastItemAdapter();
 
@@ -79,7 +82,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
         runnableHandler = new Handler();
         runnable = new Runnable() {
             public void run() {
-                Log.d(TAG,"runnable started!");
+                Log.d(TAG,"runnable started! "+FLAG);
                 if (FLAG == 1) {
                     FLAG = 0;
                 } else {
@@ -113,9 +116,17 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     protected void onStop() {
         super.onStop();
+        beaconManager.unbind(this);
+        Intent mServiceIntent = new Intent(this, SimpleService.class);
+        this.startService(mServiceIntent);
+    }*/
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         beaconManager.unbind(this);
         Intent mServiceIntent = new Intent(this, SimpleService.class);
         this.startService(mServiceIntent);
@@ -148,6 +159,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
                         beaconItem.name = s[0];
                         beaconItem.distance = s[1];
                         fastAdapter.add(beaconItem);
+
                     }
                     /*String mMessage = (String) msg.obj;
                     Log.d(TAG, "Name "+beaconItem.name+" distance "+beaconItem.distance);*/

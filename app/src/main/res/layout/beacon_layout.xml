@@ -30,7 +30,6 @@
             android:id="@+id/id1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CIAO MAMMA"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -38,7 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="CIAO MAMMA ahahahah"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 </LinearLayout>

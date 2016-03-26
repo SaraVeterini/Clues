@@ -36,7 +36,10 @@
             android:name=".RangingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity
+            android:name=".ClueActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <service
             android:name=".SimpleService"
             android:exported="false"></service>
