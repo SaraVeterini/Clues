@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/beacon_item"
     android:layout_width="fill_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
+    android:background="@color/white"
     android:orientation="horizontal">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -14,8 +15,7 @@
         android:layout_height="60dp"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
-        android:src="@drawable/new_beacon"
-        app:border_color="@color/blue_500"
+        app:border_color="@color/black"
         app:border_width="2dp"/>
 
     <LinearLayout
@@ -30,7 +30,9 @@
             android:id="@+id/id1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/distance"

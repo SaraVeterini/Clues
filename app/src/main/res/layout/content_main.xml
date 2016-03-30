@@ -8,12 +8,23 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimaryDark">
 
-    <ImageView
-        android:src="@drawable/b_icon"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+    <TextView
+        android:id="@+id/intro"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|center_horizontal"
+        android:background="@drawable/door2"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Try to get out of the room by finding the door key!"
+        android:textStyle="bold"
+        android:textColor="@color/white"/>
+
+    <!--<ImageView
+        android:src="@drawable/door"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/intro"
+        android:layout_centerHorizontal="true"></ImageView>-->
 </RelativeLayout>

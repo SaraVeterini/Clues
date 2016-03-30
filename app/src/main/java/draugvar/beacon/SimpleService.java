@@ -168,8 +168,6 @@ public class SimpleService extends Service implements BeaconConsumer
 
                 }
                 printtoscreen();
-
-
             }
 
             @Override
@@ -189,20 +187,13 @@ public class SimpleService extends Service implements BeaconConsumer
     }
 
 
-    private void logBeaconData(final boolean enter)
-    {
+    private void logBeaconData(final boolean enter) {
         final Service thisService=this;
-        beaconManager.setRangeNotifier(new RangeNotifier()
-        {
+        beaconManager.setRangeNotifier(new RangeNotifier() {
             @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region)
-            {
-
-                if (beacons.size() > 0)
-                {
-
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0) {
                     //  sBeacons.clear();
-
                     beacon = beacons.iterator().next();
 
                     Log.i(TAG, " UUID: " + beacon.getId1());
@@ -212,26 +203,22 @@ public class SimpleService extends Service implements BeaconConsumer
                     Log.i(TAG, " Power: "+ beacon.getTxPower());
                     Log.i(TAG, " Distance: "+ beacon.getDistance());
 
-
-
-                    if (map.values().contains(beacon.getIdentifiers().toString()))
-                    {
+                    if (map.values().contains(beacon.getIdentifiers().toString())) {
                         Log.i(TAG, "<<< Already there >>> "+beacon.getIdentifiers().toString());
-
                     }
-                    else
-                    {
+                    else {
+                        //put new beacon in the map
                         mapKey = mapKey + 1;
                         map.put(mapKey, beacon.getIdentifiers().toString());
                         maptime.put(mapKey, ""+System.currentTimeMillis());
 
-                        //NOtifications each time a beacon is seen for first time
+                        //Notifications each time a beacon is seen for first time
                         Intent intent = new Intent(thisService, RangingActivity.class);
                         PendingIntent pIntent = PendingIntent.getActivity(thisService, 0, intent, 0);
 
                         Notification noti = new Notification.Builder(thisService)
-                                .setContentTitle("A new beacon has been found!")
-                                .setContentText(beacon.getId1().toString()).setSmallIcon(R.drawable.b_icon)
+                                .setContentTitle("A new clue has been found!")
+                                .setSmallIcon(R.drawable.door)
                                 .setAutoCancel(true)
                                 .setContentIntent(pIntent)
                                 .build();
@@ -244,13 +231,9 @@ public class SimpleService extends Service implements BeaconConsumer
 
                     final int seconds = 10;
 
-                    while(keySetIterator.hasNext())
-                    {
+                    while(keySetIterator.hasNext()) {
                         Integer key = keySetIterator.next();
-
-
-                        if (map.get(key).contains(beacon.getIdentifiers().toString()))
-                        {
+                        if (map.get(key).contains(beacon.getIdentifiers().toString())) {
                             maptime.put(key, ""+System.currentTimeMillis());
                         }
 
@@ -259,21 +242,16 @@ public class SimpleService extends Service implements BeaconConsumer
                         int second = (int) ((diff / 1000) % 60);
                         Log.i(TAG, "key: " + key + " value: " + map.get(key)+" diff: "+second);
 
-                        if(second >= seconds )
-                        {
+                        if(second >= seconds ) {
                             Log.i(TAG, "****DELETE key: " + mapKey + " value: " + map.get(key)+" diff: "+second);
                             keySetIterator.remove();
                             maptime.remove(key);
                             //logToDisplay("\n** Beacon not longer reporting **"+ map.get(key), true);
                         }
                         //printtoscreen();
-
                     }
-
                 }
-
             }
-
         });
 
         try

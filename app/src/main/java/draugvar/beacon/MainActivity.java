@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
         //setSupportActionBar(toolbar);
 
 
-        int SPLASH_TIME_OUT = 3000;
+        int SPLASH_TIME_OUT = 5000;
         new Handler().postDelayed(new Runnable() {
 
             /*

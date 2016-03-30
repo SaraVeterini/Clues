@@ -33,14 +33,24 @@ public class BeaconItem extends AbstractItem<BeaconItem, BeaconItem.ViewHolder> 
         super.bindView(viewHolder);
 
         //bind our data
-        //set the text for the name
-        viewHolder.name.setText(String.format("ID1: %s", name));
+        if(name.equals(ClueActivity.idFirstClue)) {
+            viewHolder.immagine.setImageResource(R.drawable.clue1);
+            //set the text for the name
+            viewHolder.title.setText(String.format("The painting"));
+        }
+        else if(name.equals(ClueActivity.idSecondClue)) {
+            viewHolder.immagine.setImageResource(R.drawable.question);
+            //set the text for the name
+            viewHolder.title.setText(String.format("The enigma"));
+        }
         //set the text for the distance or hide
         viewHolder.distance.setText(String.format("Distance: %s", distance));
         viewHolder.immagine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i=new Intent(v.getContext(), ClueActivity.class);
+                //i need this to distinguish between clues in the clueactivity
+                i.putExtra("id", name);
                 v.getContext().startActivity(i);
             }
         });
@@ -50,13 +60,13 @@ public class BeaconItem extends AbstractItem<BeaconItem, BeaconItem.ViewHolder> 
 
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     protected static class ViewHolder extends RecyclerView.ViewHolder {
-        protected TextView name;
+        protected TextView title;
         protected TextView distance;
         protected ImageView immagine;
 
         public ViewHolder(View view) {
             super(view);
-            this.name = (TextView) view.findViewById(R.id.id1);
+            this.title = (TextView) view.findViewById(R.id.id1);
             this.distance = (TextView) view.findViewById(R.id.distance);
             this.immagine=(ImageView)view.findViewById(R.id.immagine);
         }

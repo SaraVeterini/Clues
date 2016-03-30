@@ -8,23 +8,22 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#D32F2F">
+    android:background="@color/colorPrimaryDark">
 
     <TextView
         android:id="@+id/testo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_above="@+id/immagine"
-        android:text="You have found a clue!"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/white"/>
 
     <ImageView
         android:id="@+id/immagine"
-        android:src="@drawable/clue"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/testo"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
 </RelativeLayout>

@@ -44,6 +44,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
         Log.i(TAG, "RANGING ");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Your clues");
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBluetoothAdapter.isEnabled()) {
@@ -79,6 +80,8 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
         // setting handler
         BeaconRangeNotifier.setBeaconHandler(beaconHandler);
 
+        /*
+        to clear already found beacons while they are still in range
         runnableHandler = new Handler();
         runnable = new Runnable() {
             public void run() {
@@ -91,7 +94,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
                 runnableHandler.postDelayed(this, 10000);
             }
         };
-        runnable.run();
+        runnable.run();*/
     }
 
     @Override
