@@ -11,7 +11,8 @@ import android.widget.TextView;
 public class ClueActivity extends Activity{
 
     //id of the two beacons I use. Modify them or add others if you have other beacons
-    public static final String idFirstClue = "b9407f30-f5f8-466e-aff9-25556b57fe6d";
+    //public static final String idFirstClue = "b9407f30-f5f8-466e-aff9-25556b57fe6d";
+    public static final String idFirstClue = "2f234454-cf6d-4a0f-adf2-012345678901";
     public static final String idSecondClue = "2f234454-cf6d-4a0f-adf2-f4911ba9ffa6";
 
     @Override

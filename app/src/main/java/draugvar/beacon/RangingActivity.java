@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,9 +23,15 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
+import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class RangingActivity extends AppCompatActivity implements BeaconConsumer {
@@ -36,6 +43,7 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
     private static int FLAG = 0;
     private static Handler runnableHandler = null;
     private static Runnable runnable;
+    private static ArrayList<CharSequence> detectedBeacons;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,8 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Your clues");
+
+        detectedBeacons=new ArrayList<CharSequence>();
 
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBluetoothAdapter.isEnabled()) {
@@ -62,8 +72,6 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
                 add(new BeaconParser().
                         setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
         beaconManager.bind(this);
-
-        beaconManager.setBackgroundScanPeriod(5000l); //fatti i fatti tuoi! :D
         beaconManager.setForegroundScanPeriod(5000l);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.beacon_recycler_view);
@@ -131,12 +139,29 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
     protected void onDestroy() {
         super.onDestroy();
         beaconManager.unbind(this);
+        try{
+            Log.i(TAG, "DESTROY");
+            beaconManager.stopRangingBeaconsInRegion(new Region("RangingUniqueId", null, null, null));
+        }catch(Exception e){}
+
         Intent mServiceIntent = new Intent(this, SimpleService.class);
+        mServiceIntent.putCharSequenceArrayListExtra("detectedBeacons", detectedBeacons);
         this.startService(mServiceIntent);
+        finish();
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if ((keyCode == KeyEvent.KEYCODE_BACK))
+        {
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
     public void onBeaconServiceConnect() {
+        beaconManager.setBackgroundMode(false);
         beaconManager.setRangeNotifier(new BeaconRangeNotifier());
         try {
             beaconManager.startRangingBeaconsInRegion(new Region("RangingUniqueId", null, null, null));
@@ -162,7 +187,10 @@ public class RangingActivity extends AppCompatActivity implements BeaconConsumer
                         beaconItem.name = s[0];
                         beaconItem.distance = s[1];
                         fastAdapter.add(beaconItem);
-
+                        String ids=new String("["+s[0]+", "+s[2]+", "+s[3]+"]");
+                        System.out.println("IDS "+ids);
+                        if(!detectedBeacons.contains(ids))
+                            detectedBeacons.add(ids);
                     }
                     /*String mMessage = (String) msg.obj;
                     Log.d(TAG, "Name "+beaconItem.name+" distance "+beaconItem.distance);*/

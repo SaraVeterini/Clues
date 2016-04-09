@@ -30,8 +30,6 @@ import java.util.Iterator;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
  */
 public class SimpleService extends Service implements BeaconConsumer
 {
@@ -94,9 +92,7 @@ public class SimpleService extends Service implements BeaconConsumer
 
         beaconManager.bind(this);
 
-        beaconManager.setForegroundBetweenScanPeriod(5000); //ok faccio come dici tu! :P
-
-
+        beaconManager.setForegroundBetweenScanPeriod(5000);
     }
 
     @Override
@@ -110,8 +106,22 @@ public class SimpleService extends Service implements BeaconConsumer
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Log.i(TAG,"onStartCommand called");
+        Log.i(TAG, "onStartCommand called");
+        ArrayList<CharSequence> detectedBeacons;
+        if(intent!=null && intent.hasExtra("detectedBeacons")) {
+            detectedBeacons = (ArrayList<CharSequence>) intent.getExtras().get("detectedBeacons");
 
+            for (CharSequence s : detectedBeacons) {
+                Log.i(TAG, "Detected beacon " + s);
+                if (!map.values().contains(s)) {
+                    mapKey += 1;
+                    Log.i(TAG, "Detected beacon " + Integer.toString(mapKey) + " " + s.toString());
+                    map.put(mapKey, s.toString());
+                } else {
+                    Log.i(TAG, "NO Detected beacon ");
+                }
+            }
+        }
         return START_STICKY; //START_REDELIVER_INTENT;
     }
     @Override
@@ -125,55 +135,45 @@ public class SimpleService extends Service implements BeaconConsumer
 
 
     @Override
-    public void onBeaconServiceConnect()
-    {
+    public void onBeaconServiceConnect() {
         Log.i(TAG, "<<< onBeaconServiceConnect  >>>");
 
-        beaconManager.setMonitorNotifier(new MonitorNotifier()
-        {
-
+        beaconManager.setMonitorNotifier(new MonitorNotifier() {
 
             @Override
-            public void didEnterRegion(Region region)
-            {
+            public void didEnterRegion(Region region) {
 
                 Log.i(TAG, "onBeaconServiceConnect \ngetId1: "+region.getId1()+"\ngetId2: "+region.getId2()+"\ngetId3: "+region.getId3());
                 Log.i(TAG, "**************-------------****************");
-
 
                 logBeaconData(true);
             }
 
             @Override
-            public void didExitRegion(Region region)
-            {
+            public void didExitRegion(Region region) {
                 //logToDisplay("Exit Region "+ region.getUniqueId(), true);
                 Log.i(TAG, "********!!!!!!!!! didExitRegion !!!!!!!!!!*******");
                 mapKey = 0;
                 logBeaconData(false);
-                try
-                {
+                try {
                     beaconManager.stopRangingBeaconsInRegion(new Region("sBeacon", null, null, null));
                 } catch (RemoteException e) { e.printStackTrace();}
 
                 Iterator<Integer> keySetIterator = map.keySet().iterator();
 
-                while(keySetIterator.hasNext())
-                {
+                while(keySetIterator.hasNext()) {
                     Integer key = keySetIterator.next();
 
                     Log.i(TAG, "****DELETE key: " + mapKey + " value: " + map.get(key));
                     keySetIterator.remove();
                     maptime.remove(key);
-
+                    map.remove(key);
                 }
                 printtoscreen();
             }
 
             @Override
-            public void didDetermineStateForRegion(int state, Region region)
-            {
-
+            public void didDetermineStateForRegion(int state, Region region) {
                 Log.i(TAG, "didDetermineStateForRegion \ngetId1: "+region.getId1()+"\ngetId2: "+region.getId2()+"\ngetId3: "+region.getId3());
             }
 
@@ -194,40 +194,42 @@ public class SimpleService extends Service implements BeaconConsumer
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     //  sBeacons.clear();
-                    beacon = beacons.iterator().next();
+                    Iterator i=beacons.iterator();
+                    while(i.hasNext()) {
 
-                    Log.i(TAG, " UUID: " + beacon.getId1());
-                    Log.i(TAG, " Major: " + beacon.getId2());
-                    Log.i(TAG, " Minor: " + beacon.getId3());
-                    Log.i(TAG, " RSSI: " + beacon.getRssi());
-                    Log.i(TAG, " Power: "+ beacon.getTxPower());
-                    Log.i(TAG, " Distance: "+ beacon.getDistance());
+                        beacon = (Beacon) i.next();
 
-                    if (map.values().contains(beacon.getIdentifiers().toString())) {
-                        Log.i(TAG, "<<< Already there >>> "+beacon.getIdentifiers().toString());
+                        Log.i(TAG, " UUID: " + beacon.getId1());
+                        Log.i(TAG, " Major: " + beacon.getId2());
+                        Log.i(TAG, " Minor: " + beacon.getId3());
+                        Log.i(TAG, " RSSI: " + beacon.getRssi());
+                        Log.i(TAG, " Power: " + beacon.getTxPower());
+                        Log.i(TAG, " Distance: " + beacon.getDistance());
+
+                        if (map.values().contains(beacon.getIdentifiers().toString())) {
+                            Log.i(TAG, "<<< Already there >>> " + beacon.getIdentifiers().toString());
+                        } else {
+                            //put new beacon in the map
+                            mapKey = mapKey + 1;
+                            map.put(mapKey, beacon.getIdentifiers().toString());
+                            maptime.put(mapKey, "" + System.currentTimeMillis());
+
+                            //Notifications each time a beacon is seen for first time
+                            Intent intent = new Intent(thisService, RangingActivity.class);
+                            PendingIntent pIntent = PendingIntent.getActivity(thisService, 0, intent, 0);
+
+                            Notification noti = new Notification.Builder(thisService)
+                                    .setContentTitle("A new clue has been found!")
+                                    .setSmallIcon(R.drawable.door)
+                                    .setAutoCancel(true)
+                                    .setContentIntent(pIntent)
+                                    .build();
+                            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                            notificationManager.notify(0, noti);
+
+                        }
                     }
-                    else {
-                        //put new beacon in the map
-                        mapKey = mapKey + 1;
-                        map.put(mapKey, beacon.getIdentifiers().toString());
-                        maptime.put(mapKey, ""+System.currentTimeMillis());
-
-                        //Notifications each time a beacon is seen for first time
-                        Intent intent = new Intent(thisService, RangingActivity.class);
-                        PendingIntent pIntent = PendingIntent.getActivity(thisService, 0, intent, 0);
-
-                        Notification noti = new Notification.Builder(thisService)
-                                .setContentTitle("A new clue has been found!")
-                                .setSmallIcon(R.drawable.door)
-                                .setAutoCancel(true)
-                                .setContentIntent(pIntent)
-                                .build();
-                        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                        notificationManager.notify(0, noti);
-
-                    }
-
-                    Iterator<Integer> keySetIterator = map.keySet().iterator();
+                    /*Iterator<Integer> keySetIterator = map.keySet().iterator();
 
                     final int seconds = 10;
 
@@ -248,30 +250,26 @@ public class SimpleService extends Service implements BeaconConsumer
                             maptime.remove(key);
                             //logToDisplay("\n** Beacon not longer reporting **"+ map.get(key), true);
                         }
-                        //printtoscreen();
-                    }
+                        printtoscreen();*/
+
                 }
             }
         });
 
-        try
-        {
+        try {
             beaconManager.startRangingBeaconsInRegion(new Region("sBeacon", null, null, null));
             Log.i(TAG, "*** startRangingBeaconsInRegion ***");
         } catch (RemoteException e) {  Log.i(TAG, "RemoteException: "+e);   }
 
     }
-    public void printtoscreen()
-    {
+    public void printtoscreen() {
         Iterator<Integer> keySetIterator = map.keySet().iterator();
         //   logToDisplay("", false);
-        while(keySetIterator.hasNext())
-        {
+        while(keySetIterator.hasNext()) {
             Integer key = keySetIterator.next();
 
             Log.i(TAG, "---------------------------------------------------");
-            if (map.get(key) != null)
-            {
+            if (map.get(key) != null) {
                 parts = map.get(key).toString().substring(1, map.get(key).toString().length()-1).split("\\,");
 
                 Log.i(TAG, "---------------------------------------------------");

@@ -29,7 +29,7 @@ public class BeaconRangeNotifier implements RangeNotifier{
             int i = 0;
             for (Beacon beacon : beacons) {
                 //checked implementation of equals in Beacon class: 2 beacons are equal if they share same three identifiers
-                beacon_array[i] = beacon.getId1() + "||" + beacon.getDistance();
+                beacon_array[i] = beacon.getId1() + "||" + beacon.getDistance() + "||"+beacon.getId2()+ "||"+ beacon.getId3();
                 i++;
                 Log.i(TAG, "Beacon " + beacon.getId1().toString());
             }
